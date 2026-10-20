@@ -47,19 +47,47 @@ There's no theme config. oma-cast binds to Omarchy's own colours, so it changes 
 
 ## Install
 
-Requires Omarchy 4 (Hyprland 0.56+, `omarchy-shell`) and `socat`, which Omarchy already ships.
+Requires Omarchy 4 with Lua-configured Hyprland 0.56+ and `omarchy-shell`.
+This fork installs as `thelifeandtimes.oma-cast` using Omarchy's plugin manager.
 
 ```sh
-git clone https://github.com/typecraft-dev/oma-cast.git
-cd oma-cast
-bin/oma-cast install          # link the plugin into omarchy-shell and the CLI into ~/.local/bin
-oma-cast setup hyprland       # bind Alt+Space
-oma-cast doctor               # check everything is wired up
+omarchy plugin install https://github.com/thelifeandtimes/oma-cast.git --enable
 ```
 
-Press **Alt+Space**. Super+Space stays the Omarchy menu. If you'd rather have oma-cast there, the swap is in `~/.config/hypr/oma-cast.lua`, commented out.
+To replace the default launcher on **Super+Space**, add these lines at the end of
+`~/.config/hypr/bindings.lua` (Super+Space normally opens the Omarchy menu):
 
-To remove it: `oma-cast uninstall`.
+```lua
+hl.unbind("SUPER + SPACE")
+o.bind("SUPER + SPACE", "oma-cast launcher", hl.dsp.global("oma-cast:toggle"))
+```
+
+Then run `hyprctl reload` and `hyprctl configerrors`; the latter should report no
+errors. To use **Alt+Space** instead, add only the `o.bind` line with `ALT + SPACE`.
+The plugin manager does not change your keybindings or install a command into PATH.
+
+You can also open the launcher without a binding:
+
+```sh
+omarchy-shell shell toggle thelifeandtimes.oma-cast
+```
+
+Update or remove it through Omarchy:
+
+```sh
+omarchy plugin update thelifeandtimes.oma-cast
+omarchy plugin remove thelifeandtimes.oma-cast
+```
+
+After removal, delete the two launcher binding lines and reload Hyprland to
+restore the default Super+Space binding. Data under `~/.local/share/oma-cast`
+is preserved. Updates follow this fork's default branch; if QML changes remain
+cached after an update, run `omarchy restart shell`.
+
+If you previously used the upstream symlink installer, remove that installation
+with its original `bin/oma-cast uninstall` before enabling this fork. Both versions
+use the same `oma-cast` IPC target, global shortcut, and saved data, so enable only
+one at a time. This fork is based on [typecraft-dev/oma-cast](https://github.com/typecraft-dev/oma-cast).
 
 ## Keyboard
 
@@ -79,11 +107,14 @@ To remove it: `oma-cast uninstall`.
 
 ## CLI
 
+The optional helper lives inside the installed checkout; it is not required for
+the launcher or its hotkey. From `~/.config/omarchy/plugins/thelifeandtimes.oma-cast`:
+
 ```sh
-oma-cast toggle | show | hide
-oma-cast run <commandId>         # e.g. app:com.mitchellh.ghostty, omarchy:style.theme
-oma-cast call <method> [json]    # call any backend method
-oma-cast doctor
+bin/oma-cast toggle | show | hide
+bin/oma-cast run <commandId>         # e.g. app:com.mitchellh.ghostty, omarchy:style.theme
+bin/oma-cast call <method> [json]    # call any backend method
+bin/oma-cast doctor
 ```
 
 ## Roadmap
@@ -102,12 +133,18 @@ The full plan is in [`SPEC.md`](SPEC.md).
 ## Development
 
 ```sh
-node --test tests/        # unit tests, no npm install needed
-tests/smoke.sh            # live checks against the running shell
-oma-cast dev          # reload on every save
+omarchy plugin validate .             # root manifest and entry points
+node --test tests/*.test.js            # unit tests, no npm install needed
+python3 tests/package-install.py       # native install/update/remove in a temporary home
+tests/qml-load.sh                      # component compatibility check (needs a Wayland session)
+tests/smoke.sh                         # live checks against the installed, enabled plugin
 ```
 
-Quickshell caches QML for the life of the process, so run `oma-cast reload` after editing anything under `plugin/`. See [`CLAUDE.md`](CLAUDE.md) for the layout and conventions.
+The root `manifest.json` points to `plugin/Launcher.qml`. Omarchy clones the whole
+repository into its plugin directory and watches it for changes. Edits to a separate
+development checkout do not affect the installed copy. If Quickshell keeps old QML
+code cached, run `omarchy restart shell`. Keep local edits on a development branch;
+the plugin updater requires a fast-forward. See [`CLAUDE.md`](CLAUDE.md) for conventions.
 
 ## Notes
 

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "typecraft.oma-cast",
+  "id": "thelifeandtimes.oma-cast",
   "name": "Oma Cast",
-  "version": "0.0.1",
-  "author": "typecraft",
+  "version": "0.0.2",
+  "author": "thelifeandtimes (fork of typecraft/oma-cast)",
   "description": "A Raycast-style launcher for Omarchy",
   "kinds": [
     "menu"
   ],
   "keepLoaded": true,
   "entryPoints": {
-    "menu": "Launcher.qml"
+    "menu": "plugin/Launcher.qml"
   }
 }

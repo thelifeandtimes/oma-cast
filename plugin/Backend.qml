@@ -18,7 +18,7 @@ import "services"
 Item {
   id: backend
 
-  readonly property string version: "0.1.0"
+  readonly property string version: "0.0.2"
   readonly property var paths: Paths.resolve(function(name) { return Quickshell.env(name) })
   readonly property string desktop: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") ? "hyprland" : "unknown"
 

@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Hyprland
 import qs.Commons
 import "ui"
@@ -11,7 +12,7 @@ import "ui"
 // which end in toggle()/show()/hide():
 //   - the Hyprland global shortcut oma-cast:toggle (no process per keypress)
 //   - `oma-cast toggle` -> omarchy-shell oma-cast toggle (shell socket)
-//   - `omarchy-shell shell toggle typecraft.oma-cast`
+//   - `omarchy-shell shell toggle thelifeandtimes.oma-cast`
 Item {
   id: root
 
@@ -20,7 +21,7 @@ Item {
   property var shell: null
   property var manifest: null
 
-  readonly property string pluginId: (root.manifest && root.manifest.id) || "typecraft.oma-cast"
+  readonly property string pluginId: (root.manifest && root.manifest.id) || "thelifeandtimes.oma-cast"
 
   property bool opened: false
   property double openedAt: 0
@@ -99,7 +100,7 @@ Item {
     onDismissRequested: root.hide()
   }
 
-  // Bound as hl.dsp.global("oma-cast:toggle"); see `oma-cast setup hyprland`.
+  // Bound as hl.dsp.global("oma-cast:toggle"); see the README's launcher setup.
   // The name is fixed: a GlobalShortcut cannot be renamed once registered.
   GlobalShortcut {
     appid: "oma-cast"
@@ -108,7 +109,7 @@ Item {
     onPressed: root.toggle()
   }
 
-  ShellIpc {
+  IpcHandler {
     target: "oma-cast"
 
     function toggle(): string {

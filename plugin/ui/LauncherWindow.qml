@@ -11,15 +11,22 @@ import qs.Ui
 //
 // Views form a navigation stack: root search, a pushed Omarchy submenu, or
 // the alias editor. Each view keeps its own query.
-OverlayWindow {
+PanelWindow {
   id: window
 
   required property var backend
   property var appLibrary: null
+  property bool shown: false
 
   signal dismissRequested()
 
   WlrLayershell.namespace: "oma-cast"
+  WlrLayershell.layer: WlrLayer.Overlay
+  WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+  visible: shown
+  color: "transparent"
+  exclusionMode: ExclusionMode.Ignore
+  anchors { top: true; bottom: true; left: true; right: true }
 
   // ------------------------------------------------------------ settings
   readonly property var general: {
